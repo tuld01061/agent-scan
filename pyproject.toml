@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentscan"
+version = "0.1.0a0"
+description = "Static security scanner for AI agent artifacts"
+readme = "AgentScan_SRS_v1.0.md"
+requires-python = ">=3.10"
+dependencies = [
+  "click>=8.1.7,<9",
+  "PyYAML>=6.0.1,<7",
+  "orjson>=3.10.0,<4",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0,<9",
+]
+
+[project.scripts]
+agentscan = "agentscan.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"agentscan.builtin_rules" = ["*.yml"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
