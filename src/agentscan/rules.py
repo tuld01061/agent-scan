@@ -33,6 +33,11 @@ ALLOWED_RULE_TARGETS = {
 }
 
 
+def load_builtin_rules() -> list[Rule]:
+    builtin_dir = Path(__file__).with_name("builtin_rules")
+    return load_rules_from_dir(builtin_dir)
+
+
 def load_rules_from_dir(directory: Path | str) -> list[Rule]:
     registry = build_matcher_registry()
     result: list[Rule] = []

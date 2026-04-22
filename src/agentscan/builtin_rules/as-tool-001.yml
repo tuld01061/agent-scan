@@ -1,0 +1,15 @@
+id: AS-TOOL-001
+category: tool_abuse
+severity: CRITICAL
+matcher_type: tool_combo
+targets:
+  - tools
+requires_all:
+  - filesystem_read
+any_of:
+  - http_post
+  - send_email
+message: File read combined with an outbound channel creates an exfiltration risk
+remediation: Remove the dangerous tool pair or add strict scope controls before release.
+owasp:
+  - LLM06

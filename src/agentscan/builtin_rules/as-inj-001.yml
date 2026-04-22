@@ -1,0 +1,15 @@
+id: AS-INJ-001
+category: prompt_injection
+severity: HIGH
+matcher_type: regex
+targets:
+  - system_prompt
+  - instruction_text
+patterns:
+  - '(?i)ignore previous instructions'
+  - '(?i)disregard your guidelines'
+view: zero_width_stripped
+message: Instruction override phrase detected
+remediation: Remove override language from trusted prompt fields.
+owasp:
+  - LLM01
