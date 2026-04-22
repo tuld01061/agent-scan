@@ -20,13 +20,14 @@ class NormalizedText:
         if view == "zero_width_stripped":
             return self.get("nfkc").translate(ZERO_WIDTH_TRANSLATION)
         if view == "decoded_base64_if_applicable":
-            candidate = self.get("zero_width_stripped").strip()
+            normalized = self.get("zero_width_stripped")
+            candidate = normalized.strip()
             try:
                 decoded = base64.b64decode(candidate, validate=True)
             except (ValueError, UnicodeDecodeError):
-                return candidate
+                return normalized
             try:
                 return decoded.decode("utf-8")
             except UnicodeDecodeError:
-                return candidate
+                return normalized
         raise KeyError(f"Unknown normalized view: {view}")
