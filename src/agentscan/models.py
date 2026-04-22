@@ -106,3 +106,10 @@ class Finding:
     message: str
     remediation: str
     owasp_refs: list[str]
+
+
+@dataclass(slots=True)
+class ScanResult:
+    files_scanned: int
+    findings: list[Finding]
+    parse_warnings: list[ParseWarning]
