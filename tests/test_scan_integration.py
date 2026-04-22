@@ -69,3 +69,15 @@ def test_scan_does_not_flag_non_imperative_act_as_phrase(tmp_path: Path) -> None
 
     assert result.exit_code == 0
     assert "AS-INJ-002" not in result.output
+
+
+def test_scan_supports_json_format_output() -> None:
+    runner = CliRunner()
+    fixture_dir = Path("tests/fixtures/unsafe")
+
+    result = runner.invoke(cli, ["scan", str(fixture_dir), "--format", "json"])
+
+    assert result.exit_code == 1
+    assert '"files_scanned": 5' in result.output
+    assert '"rule_id": "AS-INJ-001"' in result.output
+    assert '"severity": "HIGH"' in result.output

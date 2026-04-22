@@ -1,7 +1,11 @@
 import click
 
 from agentscan.models import Severity
-from agentscan.reporting import exit_code_for_findings, render_report
+from agentscan.reporting import (
+    exit_code_for_findings,
+    render_json_report,
+    render_report,
+)
 from agentscan.rules import RuleLoadError
 from agentscan.scanner import NoSupportedFilesError, scan_path
 
@@ -19,7 +23,14 @@ def cli() -> None:
     default="high",
     show_default=True,
 )
-def scan(path: str, fail_on: str) -> None:
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["console", "json"], case_sensitive=False),
+    default="console",
+    show_default=True,
+)
+def scan(path: str, fail_on: str, output_format: str) -> None:
     """Scan PATH for supported agent artifacts."""
     threshold = Severity.from_string(fail_on)
 
@@ -29,11 +40,18 @@ def scan(path: str, fail_on: str) -> None:
         click.echo(str(exc))
         raise SystemExit(2) from exc
 
-    report = render_report(
-        findings=result.findings,
-        parse_warnings=result.parse_warnings,
-        files_scanned=result.files_scanned,
-    )
+    if output_format.lower() == "json":
+        report = render_json_report(
+            findings=result.findings,
+            parse_warnings=result.parse_warnings,
+            files_scanned=result.files_scanned,
+        )
+    else:
+        report = render_report(
+            findings=result.findings,
+            parse_warnings=result.parse_warnings,
+            files_scanned=result.files_scanned,
+        )
     click.echo(report)
     raise SystemExit(exit_code_for_findings(result.findings, threshold))
 
