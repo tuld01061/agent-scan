@@ -22,6 +22,12 @@ def regex_matcher(rule: Rule, artifact: CanonicalArtifact) -> list[Finding]:
             match = pattern.search(value)
             if not match:
                 continue
+            line_start, line_end = _match_line_span(
+                text=value,
+                base_line_start=field.line_start,
+                match_start=match.start(),
+                match_end=match.end(),
+            )
 
             findings.append(
                 Finding(
@@ -30,8 +36,8 @@ def regex_matcher(rule: Rule, artifact: CanonicalArtifact) -> list[Finding]:
                     path=artifact.path,
                     field_name=field.name,
                     source_path=field.source_path,
-                    line_start=field.line_start,
-                    line_end=field.line_end,
+                    line_start=line_start,
+                    line_end=line_end,
                     snippet=match.group(0)[:160],
                     message=rule.message,
                     remediation=rule.remediation,
@@ -41,6 +47,14 @@ def regex_matcher(rule: Rule, artifact: CanonicalArtifact) -> list[Finding]:
             break
 
     return findings
+
+
+def _match_line_span(
+    text: str, base_line_start: int, match_start: int, match_end: int
+) -> tuple[int, int]:
+    start_offset = text.count("\n", 0, match_start)
+    end_offset = text.count("\n", 0, max(match_start, match_end - 1))
+    return base_line_start + start_offset, base_line_start + end_offset
 
 
 def tool_combo_matcher(rule: Rule, artifact: CanonicalArtifact) -> list[Finding]:

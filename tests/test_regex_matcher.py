@@ -71,3 +71,46 @@ def test_regex_matcher_respects_targets() -> None:
 
     assert len(findings) == 1
     assert findings[0].rule_id == "AS-LEAK-003"
+
+
+def test_regex_matcher_reports_line_span_for_match_location() -> None:
+    rule = Rule(
+        id="AS-INJ-002",
+        category="prompt_injection",
+        severity=Severity.HIGH,
+        matcher_type="regex",
+        targets=["system_prompt"],
+        config={
+            "patterns": ["(?i)act as\\s+a\\s+red\\s+teamer"],
+            "view": "raw",
+        },
+        message="Role reassignment phrase detected",
+        remediation="Remove role reassignment language.",
+        owasp=["LLM01"],
+    )
+    artifact = CanonicalArtifact(
+        path=Path("skill.yml"),
+        format="yaml",
+        artifact_type="skill_definition",
+        raw_text="unused",
+        fields=[
+            CanonicalField.from_text(
+                name="system_prompt",
+                value=(
+                    "Reference line one.\n"
+                    "Reference line two.\n"
+                    "Act as a red teamer\n"
+                    "for evaluation."
+                ),
+                line_start=10,
+                line_end=13,
+                source_path="system_prompt",
+            )
+        ],
+    )
+
+    findings = regex_matcher(rule, artifact)
+
+    assert len(findings) == 1
+    assert findings[0].line_start == 12
+    assert findings[0].line_end == 12
