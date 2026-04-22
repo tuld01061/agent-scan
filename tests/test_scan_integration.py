@@ -53,3 +53,19 @@ def test_scan_continues_when_malformed_file_is_present() -> None:
 
     assert result.exit_code == 1
     assert "Warnings: 1" in result.output
+
+
+def test_scan_does_not_flag_non_imperative_act_as_phrase(tmp_path: Path) -> None:
+    runner = CliRunner()
+    fixture = tmp_path / "reference_skill.yml"
+    fixture.write_text(
+        "instructions: |\n"
+        "  These skills act as reusable examples for the team.\n"
+        "  Keep the document descriptive and non-imperative.\n",
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(cli, ["scan", str(tmp_path)])
+
+    assert result.exit_code == 0
+    assert "AS-INJ-002" not in result.output

@@ -7,7 +7,7 @@ targets:
   - instruction_text
 patterns:
   - '(?i)you are now'
-  - '(?i)act as'
+  - '(?im)^\s*act as\b'
   - '(?i)pretend you are'
 view: zero_width_stripped
 message: Role reassignment phrase detected
