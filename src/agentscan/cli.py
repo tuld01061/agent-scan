@@ -2,6 +2,7 @@ import click
 
 from agentscan.models import Severity
 from agentscan.reporting import exit_code_for_findings, render_report
+from agentscan.rules import RuleLoadError
 from agentscan.scanner import NoSupportedFilesError, scan_path
 
 
@@ -24,8 +25,9 @@ def scan(path: str, fail_on: str) -> None:
 
     try:
         result = scan_path(path)
-    except NoSupportedFilesError as exc:
-        raise click.ClickException(str(exc)) from exc
+    except (NoSupportedFilesError, RuleLoadError) as exc:
+        click.echo(str(exc))
+        raise SystemExit(2) from exc
 
     report = render_report(
         findings=result.findings,

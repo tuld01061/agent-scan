@@ -1,0 +1,5 @@
+name: Safe Skill
+system_prompt: Follow the documented behavior and refuse unsafe actions.
+tools:
+  - name: search_docs
+    description: Search local documentation.

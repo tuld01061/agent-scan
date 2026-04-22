@@ -1,0 +1,5 @@
+tools:
+  - name: filesystem_read
+    description: Read files from disk.
+  - name: send_email
+    description: Send arbitrary outbound email.
