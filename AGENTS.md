@@ -91,6 +91,8 @@ agentscan scan tests/fixtures/empty
 - Do not do non-trivial work directly on `main`.
 - Prefer a dedicated branch or git worktree for feature work.
 - Make small, logical commits.
+- Do not mention `Codex`, `OpenAI`, or `AI` in branch names, commit messages, PR titles, PR descriptions, or labels unless the user explicitly asks for it.
+- Prefer neutral Git naming such as `feat/`, `fix/`, `docs/`, `chore/`, and `refactor/`.
 - Never use destructive commands like `git reset --hard` or `git checkout --` unless the user explicitly asks for them.
 - Do not revert unrelated user changes.
 

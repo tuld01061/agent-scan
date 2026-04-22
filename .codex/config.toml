@@ -1,0 +1,8 @@
+commit_attribution = ""
+
+developer_instructions = """
+When working with Git or GitHub in this repository:
+- Never mention Codex, OpenAI, or AI in branch names, commit messages, PR titles, PR descriptions, or labels unless the user explicitly asks for it.
+- Prefer neutral names such as feat/, fix/, docs/, chore/, and refactor/.
+- If an existing automation proposes Codex-branded wording, rewrite it to neutral project language before creating or updating the artifact.
+"""
