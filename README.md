@@ -28,6 +28,7 @@ Useful examples:
 ```bash
 agentscan scan tests/fixtures/unsafe
 agentscan scan tests/fixtures/empty
+agentscan scan tests/fixtures/unsafe --format json
 ```
 
 ## Run tests
