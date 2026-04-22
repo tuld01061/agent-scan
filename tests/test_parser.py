@@ -24,7 +24,10 @@ def test_parse_json_file_extracts_system_prompt(tmp_path: Path) -> None:
     artifact = parse_artifact(target)
 
     assert artifact.format == "json"
-    assert [field.name for field in artifact.fields].count("system_prompt") == 1
+    names = [field.name for field in artifact.fields]
+
+    assert names.count("system_prompt") == 1
+    assert "instruction_text" not in names
     assert artifact.artifact_type == "skill_definition"
 
 

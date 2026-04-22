@@ -71,12 +71,14 @@ def _extract_fields(raw_text: str, parsed_data: Any | None) -> list[CanonicalFie
             tags=["prompt"],
         )
     ]
+    extracted_prompt_field = False
 
     if isinstance(parsed_data, dict):
         for key in ("system_prompt", "instructions", "instruction", "prompt"):
             value = parsed_data.get(key)
             if isinstance(value, str):
                 canonical_name = "system_prompt" if key == "system_prompt" else "instruction_text"
+                extracted_prompt_field = True
                 fields.append(
                     CanonicalField.from_text(
                         name=canonical_name,
@@ -88,7 +90,7 @@ def _extract_fields(raw_text: str, parsed_data: Any | None) -> list[CanonicalFie
                     )
                 )
 
-    if not any(field.name == "instruction_text" for field in fields):
+    if not extracted_prompt_field:
         fields.append(
             CanonicalField.from_text(
                 name="instruction_text",
