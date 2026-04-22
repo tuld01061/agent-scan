@@ -1,0 +1,15 @@
+id: AS-INJ-003
+category: prompt_injection
+severity: CRITICAL
+matcher_type: regex
+targets:
+  - system_prompt
+  - instruction_text
+  - raw_text
+patterns:
+  - '[\u200B\u200C\u200D\uFEFF]'
+view: raw
+message: Zero-width Unicode characters detected in prompt content
+remediation: Remove hidden Unicode characters from prompt-bearing fields.
+owasp:
+  - LLM01

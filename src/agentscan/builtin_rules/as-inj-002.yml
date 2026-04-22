@@ -1,0 +1,16 @@
+id: AS-INJ-002
+category: prompt_injection
+severity: HIGH
+matcher_type: regex
+targets:
+  - system_prompt
+  - instruction_text
+patterns:
+  - '(?i)you are now'
+  - '(?i)act as'
+  - '(?i)pretend you are'
+view: zero_width_stripped
+message: Role reassignment phrase detected
+remediation: Remove role reassignment language from trusted prompt fields.
+owasp:
+  - LLM01
