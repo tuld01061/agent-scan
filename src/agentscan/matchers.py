@@ -44,7 +44,36 @@ def regex_matcher(rule: Rule, artifact: CanonicalArtifact) -> list[Finding]:
 
 
 def tool_combo_matcher(rule: Rule, artifact: CanonicalArtifact) -> list[Finding]:
-    return []
+    if not artifact.tools:
+        return []
+
+    required = {tool_name.lower() for tool_name in rule.config.get("requires_all", [])}
+    any_of = {tool_name.lower() for tool_name in rule.config.get("any_of", [])}
+    present = {tool.name.lower() for tool in artifact.tools}
+
+    if not required.issubset(present):
+        return []
+
+    matched_any = sorted(present.intersection(any_of))
+    if not matched_any:
+        return []
+
+    snippet = ", ".join(sorted(required.union(matched_any)))
+    return [
+        Finding(
+            rule_id=rule.id,
+            severity=rule.severity,
+            path=artifact.path,
+            field_name="tools",
+            source_path="tools",
+            line_start=1,
+            line_end=1,
+            snippet=snippet,
+            message=rule.message,
+            remediation=rule.remediation,
+            owasp_refs=rule.owasp,
+        )
+    ]
 
 
 def build_matcher_registry() -> dict[str, Matcher]:

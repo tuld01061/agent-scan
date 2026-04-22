@@ -6,7 +6,12 @@ from typing import Any
 import orjson
 import yaml
 
-from agentscan.models import CanonicalArtifact, CanonicalField, ParseWarning
+from agentscan.models import (
+    CanonicalArtifact,
+    CanonicalField,
+    CanonicalTool,
+    ParseWarning,
+)
 
 FORMAT_BY_SUFFIX = {
     ".yaml": "yaml",
@@ -44,6 +49,30 @@ def parse_artifact(path: Path | str) -> CanonicalArtifact:
         parse_warnings=parse_warnings,
     )
     artifact.fields.extend(_extract_fields(raw_text, parsed_data))
+    artifact.tools.extend(_extract_tools(parsed_data))
+
+    for index, tool in enumerate(artifact.tools):
+        artifact.fields.append(
+            CanonicalField.from_text(
+                name="tool_name",
+                value=tool.name,
+                line_start=tool.line_start,
+                line_end=tool.line_end,
+                source_path=f"tools[{index}].name",
+                tags=["tool"],
+            )
+        )
+        artifact.fields.append(
+            CanonicalField.from_text(
+                name="tool_description",
+                value=tool.description,
+                line_start=tool.line_start,
+                line_end=tool.line_end,
+                source_path=f"tools[{index}].description",
+                tags=["tool"],
+            )
+        )
+
     return artifact
 
 
@@ -103,3 +132,31 @@ def _extract_fields(raw_text: str, parsed_data: Any | None) -> list[CanonicalFie
         )
 
     return fields
+
+
+def _extract_tools(parsed_data: Any | None) -> list[CanonicalTool]:
+    if not isinstance(parsed_data, dict):
+        return []
+
+    tools = parsed_data.get("tools")
+    if not isinstance(tools, list):
+        return []
+
+    result: list[CanonicalTool] = []
+    for entry in tools:
+        if not isinstance(entry, dict):
+            continue
+
+        name = entry.get("name")
+        description = entry.get("description", "")
+        if isinstance(name, str) and isinstance(description, str):
+            parameters = entry.get("parameters", {})
+            result.append(
+                CanonicalTool(
+                    name=name,
+                    description=description,
+                    parameters=parameters if isinstance(parameters, dict) else {},
+                )
+            )
+
+    return result
