@@ -195,6 +195,17 @@ Every discovered file is parsed into a `CanonicalArtifact` with these conceptual
 - `metadata`: parser-derived metadata
 - `parse_warnings`: non-fatal parsing or extraction warnings
 
+### Artifact classification in v0.1
+
+Artifact classification is intentionally conservative in `v0.1`:
+
+- default classification is `unknown`
+- classify as `skill_definition` when parsed content exposes prompt-oriented keys such as `system_prompt`, `instruction`, `instructions`, or `prompt`
+- classify as `skill_definition` when parsed content exposes a top-level `tools` collection
+- `workflow_definition` and more specific ecosystem-aware classifications are deferred beyond `v0.1`
+
+This avoids implementation drift by making the initial classification rules explicit rather than leaving them as open-ended heuristics.
+
 ### CanonicalField
 
 Rules do not target arbitrary parser paths. They target canonical field names exported by the artifact model.
@@ -208,6 +219,8 @@ Each field contains:
 - `line_end`
 - `source_path`: best-effort logical location such as `tools[1].description`
 - `tags`: semantic hints such as `prompt`, `tool`, or `user_visible`
+
+In `v0.1`, tags are assigned only by the parser based on extraction context. The rules engine does not infer or mutate tags, and builtin `v0.1` rules do not depend on tags for matching behavior.
 
 ### Canonical Tool Entry
 
@@ -253,6 +266,15 @@ This avoids format-specific rule logic and keeps parser and matcher boundaries e
   - `remediation`
   - `owasp`
 - `targets` are interpreted according to `matcher_type`
+- `targets` are not free-form strings in `v0.1`
+- allowed targets are exactly:
+  - `system_prompt`
+  - `instruction_text`
+  - `tool_name`
+  - `tool_description`
+  - `raw_text`
+  - `tools`
+- rule loading must reject any rule whose target falls outside that allowed set
 - Rules never point at arbitrary parser-specific paths
 - Matchers may inspect only the canonical targets requested by the rule
 
@@ -424,6 +446,7 @@ The test strategy is designed to validate the contracts, not just implementation
 
 - valid rules load and dispatch correctly
 - unknown `matcher_type` fails as an operational error
+- unknown rule targets fail at load time as an operational error
 - findings from multiple rules are aggregated deterministically
 
 ### CLI integration tests
@@ -459,6 +482,8 @@ These decisions are intentionally deferred beyond `v0.1`:
 - provider-aware auto-discovery behavior and CLI ergonomics
 
 ## Post-v0.1 Extension: Provider-Aware Discovery
+
+This section is informational only and has no implementation impact on `v0.1`.
 
 Provider-aware discovery is a strong candidate for the first expansion after `v0.1`.
 
